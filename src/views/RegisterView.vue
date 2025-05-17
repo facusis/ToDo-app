@@ -1,10 +1,17 @@
 <template>
-  <div class="home-container">
+  <div class="register-container">
     <div class="form-wrapper">
-      <h2 class="form-title">Iniciar sesión</h2>
-      <p class="form-description">Ingresa tus credenciales para acceder.</p>
+      <h2 class="form-title">Registro</h2>
+      <p class="form-description">Ingresa tus datos para crear una cuenta.</p>
 
-      <form @submit.prevent="loginUser">
+      <form @submit.prevent="registerUser">
+        <input
+          v-model="username"
+          type="text"
+          placeholder="Nombre de usuario"
+          class="input-field"
+          required
+        />
         <input
           v-model="email"
           type="email"
@@ -19,15 +26,11 @@
           class="input-field"
           required
         />
-        <button type="submit" class="submit-btn">Iniciar sesión</button>
+        <button type="submit" class="submit-btn">Registrarse</button>
       </form>
 
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
 
-      <div class="register-link">
-        <p>¿No tienes cuenta?</p>
-        <RouterLink to="/register" class="btn-register-link">Registrarse</RouterLink>
-      </div>
     </div>
   </div>
 </template>
@@ -40,15 +43,16 @@ import { useRouter } from 'vue-router';  // Usamos vue-router para navegar
 const authStore = useAuthStore();  // Usamos el store para manejar autenticación
 const router = useRouter();  // Usamos router para redirigir
 
+const username = ref('');
 const email = ref('');
 const password = ref('');
 
-// Función para hacer login
-const loginUser = async () => {
-  const result = await authStore.loginUser(email.value, password.value);
+// Función para registrar al usuario
+const registerUser = async () => {
+  const result = await authStore.registerUser(email.value, password.value, username.value);
 
   if (result) {
-    // Hacer algo tras el login exitoso
+    // Hacer algo tras el registro exitoso
     setTimeout(() => {
       router.push('/projects');  // Redirigir a la página de proyectos
     }, 2000);
@@ -56,14 +60,14 @@ const loginUser = async () => {
 };
 </script>
 
+
 <style scoped>
-.home-container {
+.register-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   background-color: var(--color-background);
-  overflow: hidden;
 }
 
 .form-wrapper {
@@ -74,7 +78,6 @@ const loginUser = async () => {
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   text-align: center;
-  box-sizing: border-box;
 }
 
 .form-title {
@@ -115,27 +118,8 @@ const loginUser = async () => {
   background-color: var(--color-secondary);
 }
 
-.register-link {
-  margin-top: 20px;
-  box-sizing: border-box;
-}
-
-.btn-register-link {
-  color: var(--color-primary);
-  text-decoration: none;
-  font-weight: bold;
-  cursor: pointer;
-
-}
-
-.btn-register-link:hover {
-  /* background-color: var(--color-secondary); */
-  color: white;
-}
-
-.error-message {
+.success-message {
+  color: rgb(120, 224, 35);
   font-size: 1.5rem;
-  color: aqua;
-  margin-top: 1rem;
 }
 </style>
