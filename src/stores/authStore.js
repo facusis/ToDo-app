@@ -1,10 +1,9 @@
-// src/stores/authStore.js
 import { defineStore } from 'pinia';
-import { supabase } from '@/api/supabase/index'; // Asegúrate de que la configuración de Supabase esté importada
+import { supabase } from '@/api/supabase/index';
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
+    user: null, // El usuario autenticado
     errorMessage: '',
     successMessage: '',
   }),
@@ -13,7 +12,6 @@ export const useAuthStore = defineStore('auth', {
     // Función para registrar al usuario
     async registerUser(email, password, name) {
       try {
-        // Registrar al usuario en Supabase Auth
         const { user, error } = await supabase.auth.signUp({
           email: email,
           password: password,
@@ -24,21 +22,11 @@ export const useAuthStore = defineStore('auth', {
           return false;
         }
 
-        // Insertamos en la tabla 'users' con el 'user_id' de Supabase Auth
-        const { data, insertError } = await supabase
-          .from('users')
-          .insert([{ user_id: user.id, name: name }]);
-
-        if (insertError) {
-          this.errorMessage = insertError.message; // Guardamos el mensaje de error
-          return false;
-        }
-
-        this.successMessage = 'Usuario registrado correctamente';
+        this.successRegisteredMessage = 'Usuario registrado correctamente';
         this.user = user; // Guardamos el usuario en el estado
         return true;
       } catch (error) {
-        this.errorMessage = 'Hubo un problema al crear el usuario.';
+        this.errorRegisteredMessage = 'Hubo un problema al crear el usuario.';
         console.error(error);
         return false;
       }
@@ -58,7 +46,7 @@ export const useAuthStore = defineStore('auth', {
         }
 
         this.user = user; // Guardamos el usuario en el estado
-        this.successMessage = 'Usuario logueado correctamente';
+        this.successMessage = 'Usuario logueado correctamente. Bienvenido!';
         return true;
       } catch (error) {
         this.errorMessage = 'Error al iniciar sesión.';
@@ -71,7 +59,28 @@ export const useAuthStore = defineStore('auth', {
     async logoutUser() {
       await supabase.auth.signOut();
       this.user = null;
-      this.successMessage = 'Has cerrado sesión correctamente.';
+      this.successLogOutMessage = 'Has cerrado sesión correctamente.';
+
     },
+
+    // Función para comprobar si el usuario está autenticado
+    isAuthenticated() {
+      return this.user !== null;
+    },
+
+    // Función para escuchar los eventos de autenticación de Supabase
+    listenToAuthChanges() {
+      supabase.auth.onAuthStateChange((event, session) => {
+        console.log('Evento de autenticación:', event);
+        if (event === 'SIGNED_IN') {
+          this.user = session.user; // Guardamos el usuario cuando se loguea
+          this.successMessage = 'Bienvenido, has iniciado sesión correctamente!';
+        } else if (event === 'SIGNED_OUT') {
+          this.user = null; // Limpiamos el usuario cuando se cierra sesión
+          this.successMessage = 'Has cerrado sesión correctamente.';
+        }
+      });
+    }
   },
 });
+

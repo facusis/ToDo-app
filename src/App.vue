@@ -21,7 +21,7 @@
     </RouterLink>
   </div>
   <router-view />
-  <!-- Footer de la página -->
+  
   <Footer />
 </template>
 

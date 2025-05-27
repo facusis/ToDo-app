@@ -1,6 +1,52 @@
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useAuthStore } from '@/stores/authStore';
+import { useRouter } from 'vue-router';
+
+const authStore = useAuthStore();
+const router = useRouter();
+
+const email = ref('');
+const password = ref('');
+
+// Función para hacer login
+const loginUser = async () => {
+  console.log('Iniciando login...');
+
+  const result = await authStore.loginUser(email.value, password.value);
+
+  if (result) {
+    email.value = '';
+    password.value = '';
+
+    // Verificamos si el usuario está autenticado y redirigimos
+    if (authStore.isAuthenticated()) {
+      console.log('Login exitoso, redirigiendo a /projects...');
+      setTimeout(() => {
+        router.push('/projects');
+      }, 1500);
+    } else {
+      console.log('Error, no se logró autenticar al usuario');
+    }
+  } else {
+    email.value = '';
+    password.value = '';
+  }
+};
+
+// Verificar si el usuario ya está autenticado al montar el componente
+onMounted(() => {
+  if (authStore.isAuthenticated()) {
+    router.push('/projects');  // Redirigir a proyectos si está autenticado
+  }
+});
+
+</script>
+
+
 <template>
   <div class="home-container">
-    <div class="form-wrapper">
+    <div class="form-wrapper" v-if="!authStore.user">
       <h2 class="form-title">Iniciar sesión</h2>
       <p class="form-description">Ingresa tus credenciales para acceder.</p>
 
@@ -22,7 +68,7 @@
         <button type="submit" class="submit-btn">Iniciar sesión</button>
       </form>
 
-      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+      <p v-if="authStore.errorMessage" class="error-message">{{ authStore.errorMessage }}</p>
 
       <div class="register-link">
         <p>¿No tienes cuenta?</p>
@@ -32,29 +78,6 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useAuthStore } from '@/stores/authStore';  // Usamos el store de 'auth'
-import { useRouter } from 'vue-router';  // Usamos vue-router para navegar
-
-const authStore = useAuthStore();  // Usamos el store para manejar autenticación
-const router = useRouter();  // Usamos router para redirigir
-
-const email = ref('');
-const password = ref('');
-
-// Función para hacer login
-const loginUser = async () => {
-  const result = await authStore.loginUser(email.value, password.value);
-
-  if (result) {
-    // Hacer algo tras el login exitoso
-    setTimeout(() => {
-      router.push('/projects');  // Redirigir a la página de proyectos
-    }, 2000);
-  }
-};
-</script>
 
 <style scoped>
 .home-container {
@@ -125,11 +148,9 @@ const loginUser = async () => {
   text-decoration: none;
   font-weight: bold;
   cursor: pointer;
-
 }
 
 .btn-register-link:hover {
-  /* background-color: var(--color-secondary); */
   color: white;
 }
 

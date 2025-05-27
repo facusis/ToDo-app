@@ -1,3 +1,4 @@
+
 <template>
   <div class="register-container">
     <div class="form-wrapper">
@@ -29,8 +30,11 @@
         <button type="submit" class="submit-btn">Registrarse</button>
       </form>
 
-      <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+      <!-- Mensaje de éxito -->
+      <p v-if="authStore.successRegisteredMessage" class="success-message">{{ authStore.successRegisteredMessage }}</p>
 
+      <!-- Mensaje de error -->
+      <p v-if="authStore.errorRegisteredMessage" class="error-message">{{ authStore.errorRegisteredMessage }}</p>
     </div>
   </div>
 </template>
@@ -59,7 +63,6 @@ const registerUser = async () => {
   }
 };
 </script>
-
 
 <style scoped>
 .register-container {
@@ -120,6 +123,11 @@ const registerUser = async () => {
 
 .success-message {
   color: rgb(120, 224, 35);
+  font-size: 1.5rem;
+}
+
+.error-message {
+  color: red;
   font-size: 1.5rem;
 }
 </style>

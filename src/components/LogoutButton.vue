@@ -4,14 +4,16 @@
 </template>
 
 <script setup>
+  import { useAuthStore } from '@/stores/authStore';
+  import { useRouter } from 'vue-router';
 
-import { useAuthStore } from '@/stores/authStore';  // Usamos el store de auth
+  const authStore = useAuthStore();
+  const router = useRouter();
 
-const authStore = useAuthStore();  // Usamos el store de autenticación
-
-const logout = async () => {
-  await authStore.logoutUser();  // Llamamos a la acción de logout del store
-}
+  const logout = async () => {
+    await authStore.logoutUser();
+    router.push('/'); 
+  }
 
 </script>
 

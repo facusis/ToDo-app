@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { useAuthStore } from '@/stores/authStore';
 import HomeView from '../views/HomeView.vue';  // Asegúrate de importar el componente Home
 import RegisterView from '../views/RegisterView.vue';
 import ProjectsView from '../views/ProjectsView.vue';  // Asegúrate de importar ProjectsView
@@ -22,7 +23,15 @@ const router = createRouter({
     {
       path: '/projects',
       name: 'projects',
-      component: ProjectsView,  // Asignar el componente de proyectos
+      component: ProjectsView, // Asegúrate de que ProjectsView esté correctamente importado
+      beforeEnter: (to, from, next) => {
+        const authStore = useAuthStore();
+        if (!authStore.isAuthenticated()) {
+          next({ name: 'home' });  // Si no está autenticado, redirige al home
+        } else {
+          next();  // Si está autenticado, permite el acceso
+        }
+      },
     },
   ],
 });
