@@ -1,69 +1,76 @@
 
-import { ref, computed, reactive } from 'vue'
-import { defineStore } from 'pinia'
-import { createProject, getAllProjects } from '@/api/supabase/projectsApi'
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
+import { 
+  createProject, 
+  getAllProjects, 
+  deleteProject, 
+  updateProject 
+} from '@/api/supabase/projectsApi';
 
 export const useProjectsStore = defineStore('projects', () => {
-
   // State
-  const projects = reactive([])
+  const projects = ref([]);
 
-  // Getters
-
-  
   // Actions
-  async function creatTask(title, descrption) {
-    try {
-      const data = await createProject(title,descrption)
-      projects.push(data)
 
+  // Leer tareas del usuario
+  async function readTasks(user_id) {
+    try {
+      const data = await getAllProjects(user_id);
+      projects.value = data;
     } catch (err) {
-      console.log(err)
+      console.error('Error al leer tareas:', err);
     }
   }
 
-  async function readTask() {
+  // Crear tarea nueva
+  async function createTask(title, description, user_id, status = 'pending') {
     try {
-      const data = await getAllProjects()
-      projects.push(...data)
-
+      const newTask = await createProject(title, description, user_id, status );
+      if (newTask) {
+        projects.value.push(newTask); // Lo agregamos arriba
+      }
     } catch (err) {
-      console.log(err)
+      console.error('Error al crear tarea:', err);
     }
   }
 
-  async function deleteTask() {
+  // Eliminar tarea
+  async function deleteTask(id) {
     try {
-      const data = await getAllProjects()
-      projects.push(...data)
-
+      const success = await deleteProject(id);
+      if (success) {
+        projects.value = projects.value.filter(p => p.id !== id);
+      }
     } catch (err) {
-      console.log(err)
+      console.error('Error al eliminar tarea:', err);
     }
   }
 
-  async function updateTask() {
+  // Actualizar tarea (por ejemplo, marcar como completada)
+  async function updateTask(id, updates) {
     try {
-      const data = await getAllProjects()
-      projects.push(...data)
-
+      const updated = await updateProject(id, updates);
+      if (updated) {
+        const index = projects.value.findIndex(p => p.id === id);
+        if (index !== -1) {
+          projects.value[index] = updated;
+        }
+      }
     } catch (err) {
-      console.log(err)
+      console.error('Error al actualizar tarea:', err);
     }
   }
 
-  return { 
+  return {
     // State
-    projects, 
-    
-    // Getters
+    projects,
 
     // Actions
-    readTask,
-    creatTask,
+    createTask,
+    readTasks,
+    deleteTask,
     updateTask,
-    deleteTask
-  
-  
-  }
-})
+  };
+});

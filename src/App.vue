@@ -1,40 +1,46 @@
 <script setup>
-  import Footer from './components/Footer.vue';
-  import { RouterLink, useRoute } from 'vue-router';
+import Footer from './components/Footer.vue';
+import LogoutButton from './components/LogoutButton.vue';
+import { RouterLink, useRoute } from 'vue-router';
 
-  const route = useRoute(); // Obtienes la ruta actual
-
+const route = useRoute(); // Ruta actual
 </script>
 
 <template>
-  <header class="app-header">
-    <RouterLink to="/" class="logo">
-      TODOAPP
-    </RouterLink>
-  </header>
+  <!-- Barra de navegación -->
+  <nav class="navbar">
+    <RouterLink to="/" class="navbar-logo">TODOAPP</RouterLink>
 
+    <div v-if="route.path === '/projects'">
+      <LogoutButton />
+    </div>
+  </nav>
+
+  <!-- Título de bienvenida -->
   <h1 class="app-title">Bienvenido a TODOAPP</h1>
 
+  <!-- Botón solo visible en Home -->
   <div class="start-button-container" v-if="route.path === '/'">
     <RouterLink to="/home">
       <button class="btn-start">Comencemos</button>
     </RouterLink>
   </div>
+
   <router-view />
-  
   <Footer />
 </template>
 
 <style scoped>
-
-.app-header {
+/* NavBar */
+.navbar {
+  width: 100%;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
+  align-items: center;
   padding: 20px;
-  color: var(--color-text);
 }
 
-.logo {
+.navbar-logo {
   font-size: 1.2rem;
   font-weight: bold;
   color: var(--color-text);
@@ -42,15 +48,16 @@
   transition: color 0.3s;
 }
 
+/* Título principal */
 .app-title {
   font-size: 3rem;
   font-weight: bold;
   color: var(--color-text);
   text-align: center;
-  margin-top: 50px;
-
+  margin-top: 20px;
 }
 
+/* Botón de inicio */
 .start-button-container {
   display: flex;
   justify-content: center;
@@ -77,7 +84,7 @@
   color: white;
 }
 
-/* Esto garantiza que el footer se quede al final */
+/* Footer al fondo */
 footer {
   margin-top: auto;
 }

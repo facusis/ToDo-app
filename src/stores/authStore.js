@@ -74,7 +74,6 @@ export const useAuthStore = defineStore('auth', {
         console.log('Evento de autenticación:', event);
         if (event === 'SIGNED_IN') {
           this.user = session.user; // Guardamos el usuario cuando se loguea
-          this.successMessage = 'Bienvenido, has iniciado sesión correctamente!';
         } else if (event === 'SIGNED_OUT') {
           this.user = null; // Limpiamos el usuario cuando se cierra sesión
           this.successMessage = 'Has cerrado sesión correctamente.';
